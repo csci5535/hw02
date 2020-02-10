@@ -5,7 +5,7 @@ open OUnit2
 
 let assert_invalid_arg: (unit -> 'a) -> unit = fun test ->
   try
-    test ();
+    ignore (test ());
     assert_failure "expected an Invalid_argument exception"
   with Invalid_argument _ -> ()
      | e -> raise e
