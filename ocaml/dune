@@ -1,0 +1,7 @@
+(test
+ (name test_hw02)
+ (libraries base ounit2))
+
+(env
+  (dev
+    (flags (:standard -warn-error -A))))
