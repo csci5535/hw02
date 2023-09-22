@@ -27,10 +27,10 @@ You can build and run tests as follows:
 dune runtest
 ```
 
-Or, the simple top-level script
+Or, the `Makefile``
 
 ```
-./hw02.sh
+make
 ```
 
 simply calls the above.
