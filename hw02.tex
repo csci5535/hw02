@@ -1,0 +1,345 @@
+\documentclass[12pt]{exam}
+
+\usepackage{fourier}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{mathpartir}
+\usepackage{url}
+
+%% Listings
+\usepackage{listings}
+\lstdefinestyle{default}{%
+  basicstyle=\ttfamily,%
+  commentstyle=\sl,%
+  keywordstyle=\bf,%
+  columns=fullflexible,%
+  keepspaces=true,%
+  mathescape%
+}
+\lstset{style=default}
+\newcommand{\ocaml}[1]{\lstset{language=[Objective]Caml}\lstinline~#1~}
+\lstnewenvironment{OCaml}
+  {\lstset{language=[Objective]Caml}}
+  {}
+
+%% Number questions by section
+\renewcommand{\thequestion}{\thesection.\arabic{question}}
+
+%% toggle math mode and text mode for tabular and array
+\newcolumntype{C}{>{$}c<{$}}
+\newcolumntype{L}{>{$}l<{$}}
+\newcolumntype{R}{>{$}r<{$}}
+
+\newcommand{\fmtkw}[1]{\mathtt{#1}}
+
+\newcommand{\Typ}{\ensuremath{\mathsf{Typ}}}
+\newcommand{\typ}{\ensuremath{\mathit{\tau}}}
+\newcommand{\numtyp}{\ensuremath{\fmtkw{num}}}
+\newcommand{\booltyp}{\ensuremath{\fmtkw{bool}}}
+
+\newcommand{\Expr}{\ensuremath{\mathsf{Exp}}}
+\newcommand{\expr}{\ensuremath{\mathit{e}}}
+
+\newcommand{\addra}[1]{\ensuremath{\fmtkw{addr}[#1]}}
+\newcommand{\addr}{\ensuremath{\mathit{a}}}
+\newcommand{\numa}[1]{\ensuremath{\fmtkw{num}[#1]}}
+\newcommand{\num}{\ensuremath{\mathit{n}}}
+\newcommand{\boola}[1]{\ensuremath{\fmtkw{bool}[#1]}}
+\newcommand{\bool}{\ensuremath{\mathit{b}}}
+\newcommand{\plusa}[2]{\ensuremath{\fmtkw{plus}(#1; #2)}}
+\newcommand{\plusc}[2]{\ensuremath{#1 \mathbin{\fmtkw{+}} #2}}
+\newcommand{\timesa}[2]{\ensuremath{\fmtkw{times}(#1; #2)}}
+\newcommand{\timesc}[2]{\ensuremath{#1 \mathbin{\fmtkw{*}} #2}}
+\newcommand{\eqa}[2]{\ensuremath{\fmtkw{eq}(#1; #2)}}
+\newcommand{\eqc}[2]{\ensuremath{#1 \mathrel{\fmtkw{==}} #2}}
+\newcommand{\lea}[2]{\ensuremath{\fmtkw{le}(#1; #2)}}
+\newcommand{\lec}[2]{\ensuremath{#1 \mathrel{\fmtkw{<=}} #2}}
+\newcommand{\nota}[1]{\ensuremath{\fmtkw{not}(#1)}}
+\newcommand{\notc}[1]{\ensuremath{\mathord{\fmtkw{!}}#1}}
+\newcommand{\anda}[2]{\ensuremath{\fmtkw{and}(#1; #2)}}
+\newcommand{\andc}[2]{\ensuremath{#1 \mathbin{\fmtkw{\&\&}} #2}}
+\newcommand{\ora}[2]{\ensuremath{\fmtkw{or}(#1; #2)}}
+\newcommand{\orc}[2]{\ensuremath{#1 \mathbin{\fmtkw{||}} #2}}
+
+\newcommand{\Cmd}{\ensuremath{\mathsf{Cmd}}}
+\newcommand{\cmd}{\ensuremath{\mathit{c}}}
+\newcommand{\skipa}{\ensuremath{\fmtkw{skip}}}
+\newcommand{\seta}[2]{\ensuremath{\fmtkw{set}[#1](#2)}}
+\newcommand{\setc}[2]{\ensuremath{#1 \mathrel{\fmtkw{:=}} #2}}
+\newcommand{\seqa}[2]{\ensuremath{\fmtkw{seq}(#1; #2)}}
+\newcommand{\seqc}[2]{\ensuremath{#1\fmtkw{;}\;#2}}
+\newcommand{\ifa}[3]{\ensuremath{\fmtkw{if}(#1; #2; #3)}}
+\newcommand{\ifc}[3]{\ensuremath{\fmtkw{if}\;#1\;\fmtkw{then}\;#2\;\fmtkw{else}\;#3}}
+\newcommand{\whilea}[2]{\ensuremath{\fmtkw{while}(#1; #2)}}
+\newcommand{\whilec}[2]{\ensuremath{\fmtkw{while}\;#1\;\fmtkw{do}\;#2}}
+
+\newcommand{\Addr}{\ensuremath{\mathsf{Addr}}}
+
+\newcommand{\store}{\ensuremath{\sigma}}
+\newcommand{\storelet}[2]{\ensuremath{#1 \hookrightarrow #2}}
+\newcommand{\xstore}[3]{#1, \storelet{#2}{#3}}
+
+\newcommand{\IMP}{\textbf{\textsf{IMP}}\xspace}
+
+\newcommand{\E}{\textbf{\textsf{E}}\xspace}
+\newcommand{\T}{\textbf{\textsf{T}}\xspace}
+\renewcommand{\P}{\textbf{\textsf{P}}\xspace}
+\renewcommand{\S}{\textbf{\textsf{S}}\xspace}
+\newcommand{\ET}{\textbf{\textsf{ET}}\xspace}
+\newcommand{\ETP}{\textbf{\textsf{ETP}}\xspace}
+\newcommand{\ETPS}{\textbf{\textsf{ETPS}}\xspace}
+
+\newcommand{\state}[2]{\langle #1, #2 \rangle}
+
+\newcommand{\hasType}[2]{\ensuremath{#1 : #2}}
+\newcommand{\hypJ}[2]{\ensuremath{#1 \vdash #2}}
+\newcommand{\isOk}[1]{\ensuremath{#1\;\mathsf{ok}}}
+\newcommand{\eval}[2]{\ensuremath{#1 \Downarrow #2}}
+\newcommand{\step}[2]{\ensuremath{#1 \longmapsto #2}}
+\newcommand{\stepspap}[3][\typ]{\ensuremath{#2 \hookrightarrow_{:#1} #3}}
+\newcommand{\isVal}[1]{\ensuremath{#1\;\mathsf{val}}}
+\newcommand{\isFinal}[1]{\ensuremath{#1\;\mathsf{final}}}
+
+\newcommand{\even}{\operatorname{even}}
+
+\runningfooter{}{\thepage}{}
+\title{CSCI 5535: Homework Assignment 2: Language Design and Implementation}
+\date{Fall 2023: Due Friday, October 6, 2023}
+\author{}
+
+\begin{document}
+\maketitle
+
+The tasks in this homework ask you to formalize and prove meta-theoretical properties of an imperative core language~\IMP based on your experience with~\E.
+%
+This homework also asks you to implement an extension of \E in OCaml to gain experience translating formalization to implementation.
+
+Recall the evaluation guideline from the course syllabus.
+\begin{quote}\em
+  Both your ideas and also the clarity with which they are expressed
+  matter---both in your English prose and your code!
+
+  We will consider the following criteria in our grading: 
+  \begin{itemize}
+    \item \emph{How well does your submission answer the questions?}
+      For example, a common mistake is to give an example when a question
+      asks for an explanation.  An example may be useful in your
+      explanation, but it should not take the place of the explanation.
+    \item \emph{How clear is your submission?}  If we cannot
+      understand what you are trying to say, then we cannot give you
+      points for it.  Try reading your answer aloud to yourself or a
+      friend; this technique is often a great way to identify holes in
+      your reasoning.  For code, not every program that "works"
+      deserves full credit. We must be able to read and understand
+      your intent.  Make sure you state any preconditions or
+      invariants for your functions.
+  \end{itemize}
+\end{quote}
+
+\paragraph{Submission Instructions.}
+
+Typesetting is preferred but scanned, clearly legible handwritten write-ups are acceptable. Please no other formats---no
+\texttt{.doc} or \texttt{.docx}. You may use whatever tool you wish (e.g., \LaTeX, Word, markdown, plain text, pencil+paper) as long as it is legibly
+converted into a \texttt{pdf}.
+
+\section{Language Design: \IMP}
+
+In this section, we will formalize a variant of \IMP from Chapter 2 of \emph{FSPL} based on our experience from Homework Assignment 1. While it will be helpful to reference \emph{FSPL} and \emph{PFPL}, it is advised start from the principles you have learned thus far.
+
+Consider the following syntax chart for \IMP:
+\[\begin{array}{lrcllL}
+\Typ & \typ & ::= & \numtyp & \numtyp & numbers
+\\
+&&& \booltyp & \booltyp & booleans
+\\
+\Expr & \expr & ::= & \addra{\addr} & \addr & addresses (or ``assignables'') 
+\\ 
+&&& \numa{\num} & \num & numeral
+\\
+&&& \boola{\bool} & \bool & boolean
+\\
+&&& \plusa{\expr_1}{\expr_2} & \plusc{\expr_1}{\expr_2} & addition
+\\
+&&& \timesa{\expr_1}{\expr_2} & \timesc{\expr_1}{\expr_2} & multiplication
+\\
+&&& \eqa{\expr_1}{\expr_2} & \eqc{\expr_1}{\expr_2} & equal
+\\
+&&& \lea{\expr_1}{\expr_2} & \lec{\expr_1}{\expr_2} & less-than-or-equal
+\\
+&&& \nota{\expr_1} & \notc{\expr_1} & negation
+\\
+&&& \anda{\expr_1}{\expr_2} & \andc{\expr_1}{\expr_2} & conjunction
+\\
+&&& \ora{\expr_1}{\expr_2} & \orc{\expr_1}{\expr_2} & disjunction
+\\
+\Cmd & \cmd & ::= & \seta{\addr}{\expr} & \setc{\addr}{\expr} & assignment
+\\
+&&& \skipa & \skipa & skip
+\\
+&&& \seqa{\cmd_1}{\cmd_2} & \seqc{\cmd_1}{\cmd_2} & sequencing
+\\
+&&& \ifa{\expr}{\cmd_1}{\cmd_2} & \ifc{\expr}{\cmd_1}{\cmd_2} & conditional
+\\
+&&& \whilea{\expr}{\cmd_1} & \whilec{\expr}{\cmd_1} & looping
+\\
+\Addr & \addr
+\end{array}\]
+Addresses $\addr$ represent static memory store locations and are drawn from some unbounded set $\Addr$. For simplicity, we fix all memory locations to only store numbers (as in FSPL). A store $\store$ is thus a mapping from addresses to numbers, written as follows:
+\[\begin{array}{rcl}
+\store & ::= & \cdot \mid \xstore{\store}{\addr}{\num}
+\end{array}\]
+
+We rely on your prior experience with other programming languages for the semantics of the number, boolean, and command operations. Equality is polymorphic for both numbers and booleans, but all operators are monomorphic (e.g., \anda{\expr_1}{\expr_2} applies only to boolean arguments). With respect to order of evaluation, let us fix all operators to be left-to-right. Further, let us define \anda{\expr_1}{\expr_2} and \ora{\expr_1}{\expr_2} to be short circuiting.
+
+\paragraph{Extra Credit.} Complete this section where instead memory locations can store any values (i.e., numbers or booleans). Note that doing so will require extending the judgment forms with additional parameters.
+
+We have chosen to stratify the syntax to separate commands $\cmd$ from expressions $\expr$ to, at times, be able to focus on our discussion on either commands or expressions. By doing so, the semantics of \IMP will require judgment forms both for expressions and commands.
+
+\begin{questions}
+\question Formalize the statics for \IMP with two judgment forms $\hasType{\expr}{\typ}$ and $\isOk{\cmd}$ that define well-typed \IMP programs.
+
+\question Formalize the dynamics for \IMP by the following:
+\begin{parts}
+  \part Define values and final commands $\isVal{\expr}$ and $\isFinal{\cmd}$.
+
+  \part Define a small-step operational semantics with the judgment forms
+  $\step{\state{\expr}{\store}}{\state{\expr'}{\store'}}$ and
+  $\step{\state{\cmd}{\store}}{\state{\cmd'}{\store'}}$.
+
+  \part
+  \begin{subparts}
+    \subpart State the canonical forms lemmas. No need to fully prove these, but it is important sketch enough of the proofs to convince yourself (and others) that you have the correct statements.
+
+    \subpart State the progress and preservation lemmas for expressions. No need to fully prove these, but it is important to sketch enough of the proof to see that you have stated the appropriate canonical forms lemmas.
+
+    \subpart State and prove progress and preservation for commands.
+  \end{subparts}
+
+  \part \textbf{Altenative Semantics.}
+  \begin{subparts}
+    \subpart Give the alternative non--short-circuiting big-step and small-step semantics for the \anda{\expr_1}{\expr_2} expression. That is, give rules for judgment forms $\eval{\state{\expr}{\store}}{\expr'}$ and $\step{\state{\expr}{\store}}{\state{\expr'}{\store'}}$ that replace the rules given above the \anda{\expr_1}{\expr_2} expression.
+
+    \subpart Does short-circuiting versus non-short-circuiting affect the derivability in the big-step semantics?  In other words, considering the set of rules defining the big-step semantics with short-circuiting \anda{\expr_1}{\expr_2} versus the set of rules defining the big-step semantics with non-short-circuiting \anda{\expr_1}{\expr_2}, is there a judgment that is derivable in one system but not the other?  If yes, provide such a judgment and brief explanation. If not, give a brief explanation why there is no difference in derivability.
+
+   \subpart How about for the small-step semantics?  Please be clear and
+    concise.
+  \end{subparts}
+
+  \part \textbf{Manual Program Verification.} Let us write $\even(n)$ for the predicate on numbers that is true for even numbers. Prove the following statement: if $\eval{\state{\whilec{\expr}{\setc{\addr}{\plusc{\addr}{2}}}}{\store}}{\store'}$ such that $\even(\store(\addr))$, then $\even(\store'(\addr))$. You may rely on your background knowledge about the $\even$ predicate.
+\end{parts}
+\end{questions}
+
+\section{Language Implementation: \ETPS}
+
+In this section, we will implement in OCaml the language~\ETPS, that is, the language that combines language~\E (numbers and strings), language~\T (primitive recursion over natural numbers), language~\P (nullary-binary products), and language~\S (nullary-binary sums). We have already ``implemented'' \ETPS in the meta-language of grammars and judgments (in the book and in class), so when we say ``implement in OCaml,'' we consider a formulaic translation using one meta-language (grammars and judgments) to another (OCaml). For an extra challenge, you may choose a different implementation in OCaml; however, it will be best to use a programming language with good support for algebraic data types.
+
+When implementing a language, it is most effective to work by ``growing the language'' with test-driven development along the way. That is, start with the datatypes defining a small sub-language and implement all functions (e.g., type checking, substitution, evaluation, reduction) and then incrementally update the datatypes and functions with additional language features one-at-a-time. Observe that this suggested approach is in contrast to proceeding one-phase-at-a-time: first defining the syntax, then implementing the type checker, then implementing substitution, then implementing evaluation, etc.
+
+\begin{questions}
+  \question Implement language~\E along with thorough unit tests.
+  \question Implement language~\ET along with thorough unit tests.
+  \question Implement language~\ETP along with thorough unit tests.
+  \question Implement language~\ETPS along with thorough unit tests.
+\end{questions}
+
+Explain your testing strategy and justify that your test cases attempt to cover your code as thoroughly as possible (e.g., they attempt to cover different execution paths of your implementation with each test). Write this explanation as comments alongside your test code.
+
+\paragraph{Translating a Language to OCaml.}
+
+When we say ``implement Language $X$ in OCaml,'' we mean precisely the
+following components.
+
+\begin{itemize}
+\item Define the syntactic forms as OCaml datatypes (i.e., each meta-variable becomes a datatype). For terminals, we need to decide on a representation (e.g., variables~\texttt{var} as OCaml \texttt{string}s).
+\[\begin{array}{l@{\qquad}L}
+x & \ocaml{type var = string} \\
+\num & \ocaml{type num = int} \\
+s & \ocaml{type str = string} \\
+\expr & \ocaml{type exp} \\
+\typ & \ocaml{type typ} \\
+\Gamma & \ocaml{type typctx} \\
+\end{array}\]
+For testing and debugging, it is helpful to have functions that mediate between abstract syntax (i.e., OCaml values of the above types) and concrete syntax (e.g., a string of ASCII characters). Going from concrete to abstract syntax is called \emph{parsing}, and going from abstract to concrete is called \emph{pretty-printing}. We will need one for each datatype, for example,
+\begin{OCaml}
+  parse_exp : string -> exp
+  pp_exp    : exp -> string
+\end{OCaml}
+For this assignment, implementing parsing is optional (and not recommended until completing everything else).
+\item Implement OCaml functions for each function and judgment form.
+\[\begin{array}{l@{\qquad}L}
+[\expr'/x]\expr & \ocaml{val subst : exp -> var -> exp -> exp} \\
+\isVal{\expr} & \ocaml{val is_val : exp -> bool} \\
+\hypJ{\Gamma}{\hasType{\expr}{\typ}} & \ocaml{val exp_typ : typctx -> exp -> typ option} \\
+\eval{\expr}{\expr'} & \ocaml{val eval : exp -> exp} \\
+\step{\expr}{\expr'} & \ocaml{val step : exp -> exp} \\
+\end{array}\]
+For substitution \ocaml{subst}, make sure that you implement \emph{shadowing} correctly.
+
+Notice that, as a design decision, we handle errors differently for statics (\ocaml{exp_typ}) versus dynamics (\ocaml{eval} and \ocaml{step}). By error, we mean the inability to derive the judgment. For typing (\ocaml{exp_typ}$\;\Gamma\;\expr$), we return a \ocaml{typ option} where \ocaml{Some($\typ$)} indicates we have a derivation for $\hypJ{\Gamma}{\hasType{\expr}{\typ}}$ and \ocaml{None} means that we are not able to derive $\hypJ{\Gamma}{\hasType{\expr}{\typ}}$ for any $\typ$. For \ocaml{eval} and \ocaml{step}, we instead raise an exception if the input expression does not allow deriving the judgment of interest. For instance, the single-step function (\ocaml{step}$\;\expr$) should return an $\expr'$ such that $\step{\expr}{\expr'}$ or otherwise raise an \ocaml{Invalid_argument} exception.
+
+\item Implement a multiple-steps function
+\begin{OCaml}
+    steps_pap : typ -> exp -> exp
+\end{OCaml}
+that iterates the single-step function until a value. We will test progress and preservation at each step. Since \emph{meta-theory} proofs have shown progress and preservation, calls to \ocaml{step} should never raise an exception (unless you have a bug in the translation).
+
+To be precise, let us define a judgment form $\stepspap{\expr}{\expr'}$ for \ocaml{steps_pap}:
+\begin{mathpar}
+  \inferrule{
+    \hasType{\expr}{\tau}
+    \\
+    \isVal{\expr}
+  }{
+    \stepspap{\expr}{\expr}
+  }
+  
+  \inferrule{
+    \hasType{\expr}{\tau}
+    \\
+    \step{\expr}{\expr'}
+    \\
+    \stepspap{\expr'}{\expr''}
+  }{
+    \stepspap{\expr}{\expr''}
+  }
+\end{mathpar}
+As a side effect, use the pretty-printing functions above to print the expression and the type at each step.
+\end{itemize}
+
+\section{Final Project Preparation: Pre-Proposal}
+
+\begin{questions}
+\question Start thinking about the final project. Choose a partner. Review the course website for more detailed information about the class project.
+
+To receive full points on this homework, you must do the following:
+
+\begin{itemize}
+\item Answer the pre-proposal questions.
+\begin{enumerate}
+\item Who are the members of your team?
+\item What basic problem will your project try to solve?
+\end{enumerate}
+If you already have a research project, consider how to incorporate it!
+%
+Write your pre-proposal in about 250 words.
+%
+Be clear about your interests and what background reading you have done thus far.
+
+\item Scan the titles of papers at (at least) five top PL conferences.
+%
+Name these conferences (including years), and include the conference
+URL with this information.
+%
+For each conference, name the paper title and abstract that seems most
+interesting to you from that conference's proceedings that year.
+%
+Include a citation along with a URL for each paper. Using BibTeX and DBLP is recommended.
+\end{itemize}
+
+\end{questions}
+
+\end{document}
